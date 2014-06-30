@@ -80,6 +80,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         _style = style;
         _showing = NO;
         _fadeDelay = 5.0;
+        _shouldHideControls = YES;
         _timeRemainingDecrements = NO;
         _barColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
         
@@ -202,6 +203,12 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         [_bottomBar addSubview:_fullscreenButton];
     }
     
+    else if (_style == ALMoviePlayerControlsStyleEmbeddedAudio) {
+        [_bottomBar addSubview:_durationSlider];
+        [_bottomBar addSubview:_timeElapsedLabel];
+        [_bottomBar addSubview:_timeRemainingLabel];
+    }
+    
     //static stuff
     _playPauseButton = [[ALButton alloc] init];
     [_playPauseButton setImage:[UIImage imageNamed:@"moviePause.png"] forState:UIControlStateNormal];
@@ -227,8 +234,6 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 - (void)resetViews {
     [self stopDurationTimer];
     [self nilDelegates];
-    [_activityBackgroundView removeFromSuperview];
-    [_activityIndicator removeFromSuperview];
     [_topBar removeFromSuperview];
     [_bottomBar removeFromSuperview];
 }
@@ -241,6 +246,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     _seekBackwardButton.delegate = nil;
     _scaleButton.delegate = nil;
 }
+
 
 # pragma mark - Setters
 
@@ -302,6 +308,15 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     }
 }
 
+
+-(void)setSliderThumbImage:(UIImage *) image{
+    [_durationSlider setThumbImage:image forState:UIControlStateNormal];
+}
+
+-(void)setSliderUserInteractionEnabled:(BOOL) enable{
+    _durationSlider.userInteractionEnabled = enable;
+}
+
 # pragma mark - UIControl/Touch Events
 
 - (void)durationSliderTouchBegan:(UISlider *)slider {
@@ -312,7 +327,9 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 - (void)durationSliderTouchEnded:(UISlider *)slider {
     [self.moviePlayer setCurrentPlaybackTime:floor(slider.value)];
     [self.moviePlayer play];
-    [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+    if(self.shouldHideControls) {
+        [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+    }
 }
 
 - (void)durationSliderValueChanged:(UISlider *)slider {
@@ -326,11 +343,15 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 }
 
 - (void)buttonTouchedUpOutside:(UIButton *)button {
-    [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+    if(self.shouldHideControls) {
+        [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+    }
 }
 
 - (void)buttonTouchCancelled:(UIButton *)button {
-    [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+    if(self.shouldHideControls) {
+        [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+    }
 }
 
 - (void)airplayButtonTouchedDown {
@@ -338,11 +359,15 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 }
 
 - (void)airplayButtonTouchedUpOutside {
-    [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+    if(self.shouldHideControls) {
+        [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+    }
 }
 
 - (void)airplayButtonTouchFailed {
-    [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+    if(self.shouldHideControls) {
+        [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+    }
 }
 
 - (void)airplayButtonTouchedUpInside {
@@ -353,7 +378,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         keyWindow = [[[UIApplication sharedApplication] windows] objectAtIndex:0];
     }
     if (isIpad()) {
-        windowSubviews = keyWindow.layer.sublayers.count;
+        windowSubviews = (int)keyWindow.layer.sublayers.count;
         [keyWindow addObserver:self forKeyPath:@"layer.sublayers" options:NSKeyValueObservingOptionNew context:NULL];
     } else {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowDidBecomeKey:) name:UIWindowDidBecomeKeyNotification object:nil];
@@ -370,7 +395,9 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     }
     if (keyWindow.layer.sublayers.count == windowSubviews) {
         [keyWindow removeObserver:self forKeyPath:@"layer.sublayers"];
-        [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+        if(self.shouldHideControls) {
+            [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+        }
     }
 }
 
@@ -378,7 +405,9 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     UIWindow *resignedWindow = (UIWindow *)[note object];
     if ([self isAirplayShowingInView:resignedWindow]) {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:UIWindowDidResignKeyNotification object:nil];
-        [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+        if(self.shouldHideControls) {
+            [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+        }
     }
 }
 
@@ -404,7 +433,9 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 
 - (void)playPausePressed:(UIButton *)button {
     self.moviePlayer.playbackState == MPMoviePlaybackStatePlaying ? [self.moviePlayer pause] : [self.moviePlayer play];
-    [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+    if(self.shouldHideControls) {
+        [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+    }
 }
 
 - (void)fullscreenPressed:(UIButton *)button {
@@ -415,7 +446,9 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         self.moviePlayer.currentPlaybackRate = 1.f;
     }
     [self.moviePlayer setFullscreen:!self.moviePlayer.isFullscreen animated:YES];
-    [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+    if(self.shouldHideControls) {
+        [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+    }
 }
 
 - (void)scalePressed:(UIButton *)button {
@@ -428,7 +461,9 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     button.selected = !button.selected;
     self.seekBackwardButton.selected = NO;
     if (!button.selected) {
-        [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+        if(self.shouldHideControls) {
+            [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+        }
     }
 }
 
@@ -437,7 +472,9 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     button.selected = !button.selected;
     self.seekForwardButton.selected = NO;
     if (!button.selected) {
-        [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+        if(self.shouldHideControls) {
+            [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+        }
     }
 }
 
@@ -449,7 +486,13 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     if (self.style == ALMoviePlayerControlsStyleNone)
         return;
-    self.isShowing ? [self hideControls:nil] : [self showControls:nil];
+    if(self.shouldHideControls) {
+        self.isShowing ? [self hideControls:nil] : [self showControls:nil];
+    } else {
+        if(!self.isShowing) {
+            [self showControls:nil];
+        }
+    }
 }
 
 # pragma mark - Notifications
@@ -467,7 +510,9 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     [self.durationTimer invalidate];
     [self.moviePlayer setCurrentPlaybackTime:0.0];
     [self monitorMoviePlayback]; //reset values
-    [self hideControls:nil];
+    if(self.shouldHideControls) {
+        [self hideControls:nil];
+    }
     self.state = ALMoviePlayerControlsStateIdle;
 }
 
@@ -502,7 +547,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
             self.state = ALMoviePlayerControlsStateReady;
             break;
         case MPMoviePlaybackStateInterrupted:
-            self.state = ALMoviePlayerControlsStateLoading;
+            //self.state = ALMoviePlayerControlsStateLoading;
             break;
         case MPMoviePlaybackStatePaused:
         case MPMoviePlaybackStateStopped:
@@ -520,6 +565,12 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 }
 
 - (void)movieContentURLDidChange:(NSNotification *)note {
+    if(!self.shouldHideControls) {
+        if(self.moviePlayer.playbackState != MPMoviePlaybackStatePlaying) {
+            self.state =  ALMoviePlayerControlsStateLoading;
+        }
+        return ;
+    }
     [self hideControls:^{
         //don't show loading indicator for local files
         self.state = [self.moviePlayer.contentURL.scheme isEqualToString:@"file"] ? ALMoviePlayerControlsStateReady : ALMoviePlayerControlsStateLoading;
@@ -553,7 +604,9 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
             _showing = YES;
             if (completion)
                 completion();
-            [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+            if(self.shouldHideControls) {
+                [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
+            }
         }];
     } else {
         if (completion)
@@ -694,6 +747,19 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         CGFloat fullscreenHeight = fullscreenWidth;
         self.fullscreenButton.frame = CGRectMake(self.bottomBar.frame.size.width - paddingFromBezel - fullscreenWidth, self.barHeight/2 - fullscreenHeight/2, fullscreenWidth, fullscreenHeight);
         self.airplayView.frame = CGRectMake(self.fullscreenButton.frame.origin.x - paddingBetweenButtons - airplayWidth, self.barHeight/2 - airplayHeight/2, airplayWidth, airplayHeight);
+        self.timeRemainingLabel.frame = CGRectMake(self.airplayView.frame.origin.x - paddingBetweenButtons - labelWidth, 0, labelWidth, self.barHeight);
+    }
+    
+    else if (self.style == ALMoviePlayerControlsStyleEmbeddedAudio ) {
+        
+        paddingFromBezel = self.frame.size.width <= iPhoneScreenPortraitWidth ? 15.f : 25.f;
+        
+        self.bottomBar.frame = CGRectMake(0, self.frame.size.height - self.barHeight, self.frame.size.width, self.barHeight);
+        
+        //left side of bottom bar
+        self.playPauseButton.frame = CGRectMake(paddingFromBezel, self.barHeight/2 - playHeight/2, playWidth, playHeight);
+        self.timeElapsedLabel.frame = CGRectMake(self.playPauseButton.frame.origin.x + self.playPauseButton.frame.size.width + paddingBetweenButtons, 0, labelWidth, self.barHeight);
+         self.airplayView.frame = CGRectMake(self.bottomBar.frame.size.width - paddingFromBezel - airplayWidth, self.barHeight/2 - airplayHeight/2, airplayWidth, airplayHeight);
         self.timeRemainingLabel.frame = CGRectMake(self.airplayView.frame.origin.x - paddingBetweenButtons - labelWidth, 0, labelWidth, self.barHeight);
     }
     

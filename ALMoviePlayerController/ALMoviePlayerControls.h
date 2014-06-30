@@ -13,6 +13,9 @@
 
 typedef enum {
     /** Controls will appear in a bottom bar */
+    ALMoviePlayerControlsStyleEmbeddedAudio,
+    
+    /** Controls will appear in a bottom bar */
     ALMoviePlayerControlsStyleEmbedded,
     
     /** Controls will appear in a top bar and bottom bar */
@@ -92,10 +95,20 @@ typedef enum {
  */
 @property (nonatomic, readonly, getter = isShowing) BOOL showing;
 
+/**
+ Should the controls be faded?
+ 
+ Default Value is YES;
+ */
+@property (nonatomic, assign) BOOL shouldHideControls;
 
 /** 
  The default initializer method. The parameter may not be nil.
  */
 - (id)initWithMoviePlayer:(ALMoviePlayerController *)moviePlayer style:(ALMoviePlayerControlsStyle)style;
+
+- (void)setSliderThumbImage:(UIImage *) image;
+
+-(void)setSliderUserInteractionEnabled:(BOOL) enable;
 
 @end
