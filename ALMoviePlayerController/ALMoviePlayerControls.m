@@ -36,7 +36,7 @@ static const inline BOOL isIpad() {
     return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
 }
 static const CGFloat activityIndicatorSize = 40.f;
-static const CGFloat iPhoneScreenPortraitWidth = 320.f;
+static CGFloat iPhoneScreenPortraitWidth;
 
 @interface ALMoviePlayerControls () <ALAirplayViewDelegate, ALButtonDelegate> {
     @private
@@ -105,6 +105,9 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 # pragma mark - Construct/Destruct Helpers
 
 - (void)setup {
+    
+    iPhoneScreenPortraitWidth = [[UIScreen mainScreen]bounds].size.width;
+    
     if (self.style == ALMoviePlayerControlsStyleNone)
         return;
 
@@ -720,6 +723,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         
         //bottom bar
         self.bottomBar.frame = CGRectMake(0, self.frame.size.height - self.barHeight, self.frame.size.width, self.barHeight);
+        
         self.playPauseButton.frame = CGRectMake(self.bottomBar.frame.size.width/2 - playWidth/2, self.barHeight/2 - playHeight/2, playWidth, playHeight);
         self.seekForwardButton.frame = CGRectMake(self.playPauseButton.frame.origin.x + self.playPauseButton.frame.size.width + paddingBetweenPlaybackButtons, self.barHeight/2 - seekHeight/2 + 1.f, seekWidth, seekHeight);
         self.seekBackwardButton.frame = CGRectMake(self.playPauseButton.frame.origin.x - paddingBetweenPlaybackButtons - seekWidth, self.barHeight/2 - seekHeight/2 + 1.f, seekWidth, seekHeight);
