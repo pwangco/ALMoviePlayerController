@@ -509,6 +509,12 @@ static CGFloat iPhoneScreenPortraitWidth;
 }
 
 - (void)movieFinished:(NSNotification *)note {
+    ALMoviePlayerController *sender = (ALMoviePlayerController*)[note object];
+    
+    if(![sender isEqual:self.moviePlayer]) {
+        return ;
+    }
+    
     self.playPauseButton.selected = YES;
     [self.durationTimer invalidate];
     [self.moviePlayer setCurrentPlaybackTime:0.0];
@@ -520,6 +526,13 @@ static CGFloat iPhoneScreenPortraitWidth;
 }
 
 - (void)movieLoadStateDidChange:(NSNotification *)note {
+    
+    ALMoviePlayerController *sender = (ALMoviePlayerController*)[note object];
+    
+    if(![sender isEqual:self.moviePlayer]) {
+        return ;
+    }
+    
     switch (self.moviePlayer.loadState) {
         case MPMovieLoadStatePlayable:
         case MPMovieLoadStatePlaythroughOK:
@@ -535,6 +548,13 @@ static CGFloat iPhoneScreenPortraitWidth;
 }
 
 - (void)moviePlaybackStateDidChange:(NSNotification *)note {
+    
+    ALMoviePlayerController *sender = (ALMoviePlayerController*)[note object];
+    
+    if(![sender isEqual:self.moviePlayer]) {
+        return ;
+    }
+    
     switch (self.moviePlayer.playbackState) {
         case MPMoviePlaybackStatePlaying:
             self.playPauseButton.selected = NO;
@@ -564,10 +584,21 @@ static CGFloat iPhoneScreenPortraitWidth;
 }
 
 - (void)movieDurationAvailable:(NSNotification *)note {
+    ALMoviePlayerController *sender = (ALMoviePlayerController*)[note object];
+    
+    if(![sender isEqual:self.moviePlayer]) {
+        return ;
+    }
     [self setDurationSliderMaxMinValues];
 }
 
 - (void)movieContentURLDidChange:(NSNotification *)note {
+    ALMoviePlayerController *sender = (ALMoviePlayerController*)[note object];
+    
+    if(![sender isEqual:self.moviePlayer]) {
+        return ;
+    }
+    
     if(!self.shouldHideControls) {
         if(self.moviePlayer.playbackState != MPMoviePlaybackStatePlaying) {
             self.state =  ALMoviePlayerControlsStateLoading;

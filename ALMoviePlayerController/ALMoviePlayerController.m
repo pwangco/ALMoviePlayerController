@@ -110,8 +110,13 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
     if (!_controls) {
         [[NSException exceptionWithName:@"ALMoviePlayerController Exception" reason:@"Set contentURL after setting controls." userInfo:nil] raise];
     }
+    
+    if(!contentURL) {
+        return ;
+    }
+    
     [super setContentURL:contentURL];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ALMoviePlayerContentURLDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ALMoviePlayerContentURLDidChangeNotification object:self];
     [self play];
 }
 
