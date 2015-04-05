@@ -291,7 +291,7 @@ static CGFloat iPhoneScreenPortraitWidth;
         
         switch (state) {
             case ALMoviePlayerControlsStateLoading:
-                [self showLoadingIndicators];
+                //[self showLoadingIndicators];
                 break;
             case ALMoviePlayerControlsStateReady:
                 [self hideLoadingIndicators];
