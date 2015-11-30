@@ -133,7 +133,7 @@ static CGFloat iPhoneScreenPortraitWidth;
     
     _timeElapsedLabel = [[UILabel alloc] init];
     _timeElapsedLabel.backgroundColor = [UIColor clearColor];
-    _timeElapsedLabel.font = [UIFont systemFontOfSize:12.f];
+    _timeElapsedLabel.font = [UIFont systemFontOfSize:11.f];
     _timeElapsedLabel.textColor = [UIColor lightTextColor];
     _timeElapsedLabel.textAlignment = NSTextAlignmentRight;
     _timeElapsedLabel.text = @"0:00";
@@ -144,7 +144,7 @@ static CGFloat iPhoneScreenPortraitWidth;
     
     _timeRemainingLabel = [[UILabel alloc] init];
     _timeRemainingLabel.backgroundColor = [UIColor clearColor];
-    _timeRemainingLabel.font = [UIFont systemFontOfSize:12.f];
+    _timeRemainingLabel.font = [UIFont systemFontOfSize:11.f];
     _timeRemainingLabel.textColor = [UIColor lightTextColor];
     _timeRemainingLabel.textAlignment = NSTextAlignmentLeft;
     _timeRemainingLabel.text = @"0:00";
